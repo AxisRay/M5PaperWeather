@@ -28,3 +28,5 @@
      *Thanks to the Arduino community with all its incredible possibilities and support.** 
    * Special thanks for the drawing function of the moon and the wind section from David Bird
      https://github.com/G6EJD/ESP32-Revised-Weather-Display-42-E-Paper
+   * 感谢Bastelschlumpf所做的改进，本项目基本沿用原有代码，只做了些微小的改动
+     https://github.com/Bastelschlumpf/M5PaperWeather
