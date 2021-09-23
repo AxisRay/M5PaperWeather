@@ -21,41 +21,61 @@
   */
 #pragma once
 #include <WiFi.h>
+#include "Config.h"
+
+#ifdef WPA2_EAP_ID
+#include "esp_wpa2.h"
+#include "esp_wifi.h"
+#include "esp_wpa2.h"
+#endif
 
 /* Start and connect to the wifi */
-bool StartWiFi(int &rssi) 
+bool StartWiFi(int &rssi)
 {
    IPAddress dns(8, 8, 8, 8); // Google DNS
-   
+
    WiFi.mode(WIFI_STA);
    WiFi.disconnect();
    WiFi.setAutoConnect(true);
    WiFi.setAutoReconnect(true);
 
-   Serial.print("Connecting to ");
-   Serial.println(WIFI_SSID);
+   log_i("Connecting to %s",WIFI_SSID);
    delay(100);
-   
-   WiFi.begin(WIFI_SSID, WIFI_PW);
 
-   for (int retry = 0; WiFi.status() != WL_CONNECTED && retry < 30; retry++) {
+#ifdef WPA2_EAP_ID
+   esp_wpa2_config_t config = WPA2_CONFIG_INIT_DEFAULT();
+   // This part of the code is taken from the oficial wpa2_enterprise example from esp-idf
+   ESP_ERROR_CHECK(esp_wifi_set_mode(WIFI_MODE_STA));
+   ESP_ERROR_CHECK(esp_wifi_sta_wpa2_ent_set_identity((uint8_t *)WPA2_EAP_ID, strlen(WPA2_EAP_ID)));
+   ESP_ERROR_CHECK(esp_wifi_sta_wpa2_ent_set_username((uint8_t *)WPA2_EAP_USERNAME, strlen(WPA2_EAP_USERNAME)));
+   ESP_ERROR_CHECK(esp_wifi_sta_wpa2_ent_set_password((uint8_t *)WPA2_EAP_PASSWORD, strlen(WPA2_EAP_PASSWORD)));
+   ESP_ERROR_CHECK(esp_wifi_sta_wpa2_ent_enable(&config));
+   WiFi.begin(WIFI_SSID);
+#else
+   WiFi.begin(WIFI_SSID, WIFI_PW);
+#endif
+   for (int retry = 0; WiFi.status() != WL_CONNECTED && retry < 10; retry++)
+   {
       delay(500);
       Serial.print(".");
    }
 
    rssi = 0;
-   if (WiFi.status() == WL_CONNECTED) {
+   if (WiFi.status() == WL_CONNECTED)
+   {
       rssi = WiFi.RSSI();
-      Serial.println("WiFi connected at: " + WiFi.localIP().toString());
+      log_i("WiFi connected at: %s", WiFi.localIP().toString());
       return true;
-   } else {
-      Serial.println("WiFi connection *** FAILED ***");
+   }
+   else
+   {
+      log_e("WiFi connection *** FAILED ***");
       return false;
    }
 }
 
 /* Stop the wifi connection */
-void StopWiFi() 
+void StopWiFi()
 {
    Serial.println("Stop WiFi");
    WiFi.disconnect();

@@ -24,7 +24,7 @@
 /* Initialize the M5Paper */
 void InitEPD(bool clearDisplay = true)
 {
-   M5.begin(false, false, true, true, false);
+   M5.begin(false, true, true, true, false);
    M5.RTC.begin();
    
    M5.EPD.SetRotation(0);

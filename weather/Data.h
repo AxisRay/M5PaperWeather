@@ -38,9 +38,6 @@ public:
    int     batteryCapacity;  //!< The current battery capacity
    int     sht30Temperatur;  //!< SHT30 temperature
    int     sht30Humidity;    //!< SHT30 humidity
-
-   time_t  moonRise;         //!< Calculated moon rise
-   time_t  moonSet;          //!< Calculated moon set
    
    Weather weather;          //!< All the openweathermap data
 
@@ -51,15 +48,13 @@ public:
       , batteryCapacity(0)
       , sht30Temperatur(0)
       , sht30Humidity(0)
-      , moonRise(0)
-      , moonSet(0)
    {
    }
 
    /* helper function to dump all the collected data */
    void Dump()
    {
-      Serial.println("DateTime: "        + getRTCDateTimeString());
+      Serial.println("DateTime: "        + String(weather.currentTime.format("DD.MM.YYYY hh:mm:ss")));
       
       Serial.println("Latitude: "        + String(LATITUDE));
       Serial.println("Longitude: "       + String(LONGITUDE));
@@ -68,11 +63,11 @@ public:
       Serial.println("BatteryCapacity: " + String(batteryCapacity));
       Serial.println("Sht30Temperatur: " + String(sht30Temperatur));
       Serial.println("Sht30Humidity: "   + String(sht30Humidity));
-      Serial.println("MoonRise: "        + getDateTimeString(moonRise));
-      Serial.println("MoonSet: "         + getDateTimeString(moonSet));
+      Serial.println("MoonRise: "        + String(weather.moonrise.format("DD.MM.YYYY hh:mm:ss")));
+      Serial.println("MoonSet: "         + String(weather.moonset.format("DD.MM.YYYY hh:mm:ss")));
       
-      Serial.println("Sunrise: "         + getDateTimeString(weather.sunrise));
-      Serial.println("Sunset: "          + getDateTimeString(weather.sunset));
+      Serial.println("Sunrise: "         + String(weather.sunrise.format("DD.MM.YYYY hh:mm:ss")));
+      Serial.println("Sunset: "          + String(weather.sunset.format("DD.MM.YYYY hh:mm:ss")));
       Serial.println("Winddir: "         + String(weather.winddir));
       Serial.println("Windspeed: "       + String(weather.windspeed));
    }

@@ -1,3 +1,4 @@
+
 /*
    Copyright (C) 2021 SFini
 
@@ -22,20 +23,19 @@
   
 #include <M5EPD.h>
 #include "Config.h"
-#include "ConfigOverride.h" // Remove this line
 #include "Data.h"
 #include "Display.h"
 #include "Battery.h"
 #include "EPD.h"
 #include "EPDWifi.h"
-#include "Moon.h"
 #include "SHT30.h"
 #include "Time.h"
 #include "Utils.h"
 #include "Weather.h"
 
+
 // Refresh the M5Paper info more often.
-// #define REFRESH_PARTLY 1
+//#define REFRESH_PARTLY 1
 
 MyData         myData;            // The collection of the global data
 WeatherDisplay myDisplay(myData); // The global display helper class
@@ -44,32 +44,33 @@ WeatherDisplay myDisplay(myData); // The global display helper class
 void setup()
 {
 #ifndef REFRESH_PARTLY
-   InitEPD(true);
+   InitEPD(false);
+   myDisplay.LoadFont("/SourceHanSans-Bold.ttf");
    if (StartWiFi(myData.wifiRSSI)) {
       GetBatteryValues(myData);
       GetSHT30Values(myData);
-      GetMoonValues(myData);
       if (myData.weather.Get()) {
-         SetRTCDateTime(myData);
+         myData.Dump();
+         M5.EPD.Clear(true);
+         myDisplay.Show();
       }
-      myData.Dump();
-      myDisplay.Show();
       StopWiFi();
    }
    ShutdownEPD(60 * 60); // every 1 hour
 #else 
    myData.LoadNVS();
+   myDisplay.LoadFont("/SourceHanSans-Bold.ttf");
    if (myData.nvsCounter == 1) {
-      InitEPD(true);
+      InitEPD();
       if (StartWiFi(myData.wifiRSSI)) {
          GetBatteryValues(myData);
          GetSHT30Values(myData);
-         GetMoonValues(myData);
          if (myData.weather.Get()) {
-            SetRTCDateTime(myData);
+            //SetRTCDateTime(myData);
+            myData.Dump();
+            M5.EPD.Clear(true);
+            myDisplay.Show();
          }
-         myData.Dump();
-         myDisplay.Show();
          StopWiFi();
       }
    } else {
